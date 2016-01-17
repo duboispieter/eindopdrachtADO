@@ -19,7 +19,7 @@ namespace Videotheek
             {
                 using (var comGetFilms = conVideo.CreateCommand())
                 {
-                    comGetFilms.CommandText = "SELECT * FROM FILMS";
+                    comGetFilms.CommandText = "SELECT * FROM FILMS ORDER BY Titel";
                     comGetFilms.CommandType = CommandType.Text;
 
                     conVideo.Open();
@@ -45,6 +45,7 @@ namespace Videotheek
                             f.UitVoorraad = rdrFilms.GetInt32(uitvPos);
                             f.Prijs = rdrFilms.GetDecimal(prijsPos);
                             f.TotaalVerhuurd = rdrFilms.GetInt32(totverhPos);
+                            f.Changed = false;
 
                             films.Add(f);
                         }
@@ -102,5 +103,69 @@ namespace Videotheek
             }
         }
 
+        public void VerwijderFilms(List<Film> films)
+    
+        {
+            using (var conVideo = manager.GetConnection())
+            {
+                using (var comDelete = conVideo.CreateCommand())
+                {
+                    comDelete.CommandType = CommandType.Text;
+                    comDelete.CommandText = "DELETE FROM Films WHERE BandNr=@BandNr";
+
+                    var parBandNr = comDelete.CreateParameter();
+                    parBandNr.ParameterName = "@BandNr";
+                    comDelete.Parameters.Add(parBandNr);
+
+                    conVideo.Open();
+
+                    foreach (Film f in films)
+                    {
+                        parBandNr.Value = f.BandNr;
+                        comDelete.ExecuteNonQuery();
+                    }
+                }
+            }
+        }
+
+        public void UpdateVoorraad(List<Film> films)
+        {
+            using (var conVideo = manager.GetConnection())
+            {
+                using (var comUpdate = conVideo.CreateCommand())
+                {
+                    comUpdate.CommandType = CommandType.Text;
+                    comUpdate.CommandText = "UPDATE Films SET InVoorraad=@invoorraad, UitVoorraad=@uitvoorraad, TotaalVerhuurd=@totaalverhuurd WHERE BandNr=@bandnr";
+
+                    var parInv = comUpdate.CreateParameter();
+                    parInv.ParameterName = "@invoorraad";
+                    comUpdate.Parameters.Add(parInv);
+
+                    var parUitv = comUpdate.CreateParameter();
+                    parUitv.ParameterName = "@uitvoorraad";
+                    comUpdate.Parameters.Add(parUitv);
+
+                    var parTot = comUpdate.CreateParameter();
+                    parTot.ParameterName = "@totaalverhuurd";
+                    comUpdate.Parameters.Add(parTot);
+
+                    var parBandNr = comUpdate.CreateParameter();
+                    parBandNr.ParameterName = "@bandnr";
+                    comUpdate.Parameters.Add(parBandNr);
+
+                    conVideo.Open();
+
+                    foreach (Film f in films)
+                    {
+                        parInv.Value = f.InVoorraad;
+                        parUitv.Value = f.UitVoorraad;
+                        parTot.Value = f.TotaalVerhuurd;
+                        parBandNr.Value = f.BandNr;
+
+                        comUpdate.ExecuteNonQuery();
+                    }
+                }
+            }
+        }
     }
 }

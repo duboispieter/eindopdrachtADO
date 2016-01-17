@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Videotheek
 {
-   public class Film
+   public class Film: INotifyPropertyChanged
     {
        public bool Changed;
         private int bandNrValue;
@@ -14,7 +15,7 @@ namespace Videotheek
         public int BandNr
         {
             get { return bandNrValue; }
-            set { bandNrValue = value; Changed = true; }
+            set { bandNrValue = value;}
         }
 
         private string titelValue;
@@ -22,7 +23,7 @@ namespace Videotheek
         public string Titel
         {
             get { return titelValue; }
-            set { titelValue = value; Changed = true; }
+            set { titelValue = value; }
         }
 
         private int genreNrValue;
@@ -30,39 +31,41 @@ namespace Videotheek
         public int GenreNr
         {
             get { return genreNrValue; }
-            set { genreNrValue = value; Changed = true; }
+            set { genreNrValue = value; }
         }
 
-        private int inVoorraadValue;
+        private int? inVoorraadValue;
 
-        public int InVoorraad
+        public int? InVoorraad
         {
             get { return inVoorraadValue; }
-            set { inVoorraadValue = value; Changed = true; }
+            set { inVoorraadValue = value; Changed = true; NotifyPropertyChanged("InVoorraad"); }
         }
 
-        private int uitVoorraadValue;
+        private int? uitVoorraadValue;
 
-        public int UitVoorraad
+        public int? UitVoorraad
         {
             get { return uitVoorraadValue; }
-            set { uitVoorraadValue = value; Changed = true; }
+            set { uitVoorraadValue = value; Changed = true; NotifyPropertyChanged("UitVoorraad"); }
         }
 
-        private decimal prijsValue;
+        private decimal? prijsValue;
 
-        public decimal Prijs
+        public decimal? Prijs
         {
             get { return prijsValue; }
-            set { prijsValue = value; Changed = true; }
+            set { prijsValue = value;}
         }
 
-        private int totaalVerhuurdValue;
+        private int? totaalVerhuurdValue;
 
-        public int TotaalVerhuurd
+        
+
+        public int? TotaalVerhuurd
         {
             get { return totaalVerhuurdValue; }
-            set { totaalVerhuurdValue = value; Changed = true; }
+            set { totaalVerhuurdValue = value; Changed = true; NotifyPropertyChanged("TotaalVerhuurd"); }
         }
 
         public Film()
@@ -81,12 +84,18 @@ namespace Videotheek
             TotaalVerhuurd = totaalverhuurd;
             this.Changed = false;
         }
-        
-        
-        
-        
-        
-        
-        
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void NotifyPropertyChanged(String propertyName = "")
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+
+
+
     }
 }
